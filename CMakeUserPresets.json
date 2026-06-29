@@ -6,7 +6,8 @@
             "displayName": "x64 Debug (User)",
             "inherits": "x64-debug",
           "cacheVariables": {
-            "CMAKE_PREFIX_PATH": "C:\\SDKs\\SDL;C:\\SDKs\\SDL_ttf;C:\\SDKs\\SDL_image"
+            "CMAKE_PREFIX_PATH": "C:\\SDKs\\SDL;C:\\SDKs\\SDL_ttf;C:\\SDKs\\SDL_image",
+            "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
           }
         }
     ]
