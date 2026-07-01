@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error initializing SDL", nullptr);
 		return 1;
 	}
-
+	
 	// Create window
 	int h = 540;
 	int w = 960;
@@ -55,12 +55,16 @@ int main(int argc, char *argv[])
 		// Handle exit
 		while (SDL_PollEvent(&event))
 		{
-			if (event.type == SDL_EVENT_QUIT)
+			switch (event.type)
 			{
-				isRunning = false;
-				break;
+				case SDL_EVENT_QUIT:
+				{
+					isRunning = false;
+					break;
+				}
 			}
-			else if (keyState[SDL_SCANCODE_ESCAPE] == true)
+
+			if (keyState[SDL_SCANCODE_ESCAPE] == true)
 			{
 				isRunning = false;
 				break;
@@ -79,6 +83,7 @@ int main(int argc, char *argv[])
 
 void CleanUp(SDL_State &state)
 {
+	SDL_DestroyRenderer(state.renderer);
 	SDL_DestroyWindow(state.window);
 	SDL_Quit();
 }
