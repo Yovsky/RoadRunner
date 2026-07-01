@@ -6,10 +6,18 @@
 
 using namespace std;
 
-void CleanUp(SDL_Window* window);
+struct SDL_State
+{
+	SDL_Window* window;
+	SDL_Renderer* renderer;
+};
+
+void CleanUp(SDL_State &window);
 
 int main(int argc, char *argv[])
 {
+	SDL_State state;
+
 	// Initialize SDL
 	if (!SDL_Init(SDL_INIT_VIDEO))
 	{
@@ -20,21 +28,21 @@ int main(int argc, char *argv[])
 	// Create window
 	int h = 540;
 	int w = 960;
-	SDL_Window* window = SDL_CreateWindow("RoadRunner", w, h, SDL_WINDOW_RESIZABLE);
-	if (!window)
+	state.window = SDL_CreateWindow("RoadRunner", w, h, SDL_WINDOW_RESIZABLE);
+	if (!state.window)
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error creating game window", nullptr);
 	}
 
 	// Create renderer
-	SDL_Renderer* renderer = SDL_CreateRenderer(window, nullptr);
-	if (!renderer)
+	state.renderer = SDL_CreateRenderer(state.window, nullptr);
+	if (!state.renderer)
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error creating renderer", nullptr);
 	}
 
 	// Handle window resize
-	SDL_SetRenderLogicalPresentation(renderer, w, h, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+	SDL_SetRenderLogicalPresentation(state.renderer, w, h, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
 	SDL_Event event;
 
@@ -59,18 +67,18 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-		SDL_RenderClear(renderer);
+		SDL_SetRenderDrawColor(state.renderer, 255, 255, 255, 255);
+		SDL_RenderClear(state.renderer);
 
-		SDL_RenderPresent(renderer);
+		SDL_RenderPresent(state.renderer);
 	}
 
-	CleanUp(window);
+	CleanUp(state);
 	return 0;
 }
 
-void CleanUp(SDL_Window* window)
+void CleanUp(SDL_State &state)
 {
-	SDL_DestroyWindow(window);
+	SDL_DestroyWindow(state.window);
 	SDL_Quit();
 }
