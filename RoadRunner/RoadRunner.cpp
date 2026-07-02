@@ -34,16 +34,28 @@ int main(int argc, char *argv[])
 	SDL_Texture* playerCar = IMG_LoadTexture(state.renderer, "assets/textures/cars/Compact/compact_blue.png");
 	SDL_SetTextureScaleMode(playerCar, SDL_SCALEMODE_NEAREST);
 
+	// Load road texture
+	SDL_Texture* road = IMG_LoadTexture(state.renderer, "assets/textures/environment/road.png");
+	SDL_SetTextureScaleMode(road, SDL_SCALEMODE_NEAREST);
+
 	SDL_Event event;
 
 	const bool* keyState = SDL_GetKeyboardState(nullptr);
 
 	// Set the player position
-	SDL_FRect pDst{
+	SDL_FRect playerDst{
 			.x = state.logW / 2,
 			.y = state.logH - 63,
 			.w = 26,
 			.h = 58
+	};
+
+	// Set the road position
+	SDL_FRect roadDst{
+			.x = state.logW / 2 - 100,
+			.y = 0,
+			.w = 200,
+			.h = state.logH
 	};
 	
 	// Set the player speed
@@ -86,11 +98,17 @@ int main(int argc, char *argv[])
 		SDL_SetRenderDrawColor(state.renderer, 255, 255, 255, 255);
 		SDL_RenderClear(state.renderer);
 
-		// Handle player movement
-		if (keyState[SDL_SCANCODE_A] == true)	pDst.x -= 200 * deltaTime;
-		if (keyState[SDL_SCANCODE_D] == true)	pDst.x += 200 * deltaTime;
+		SDL_RenderTexture(state.renderer, road, nullptr, &roadDst);
 
-		SDL_RenderTexture(state.renderer, playerCar, nullptr, &pDst);
+		float playerNewX = playerDst.x;
+
+		// Handle player movement
+		if (keyState[SDL_SCANCODE_A] == true)	playerNewX -= 200 * deltaTime;
+		if (keyState[SDL_SCANCODE_D] == true)	playerNewX += 200 * deltaTime;
+
+		if (playerNewX > roadDst.x && playerNewX + playerDst.w < roadDst.x + 200) playerDst.x = playerNewX;
+
+		SDL_RenderTexture(state.renderer, playerCar, nullptr, &playerDst);
 
 		SDL_RenderPresent(state.renderer);
 	}
