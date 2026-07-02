@@ -10,43 +10,29 @@ struct SDL_State
 {
 	SDL_Window* window;
 	SDL_Renderer* renderer;
+	int h, w, logH, logW;
 };
+
+bool Init(SDL_State &state);
 
 void CleanUp(SDL_State &window);
 
 int main(int argc, char *argv[])
 {
 	SDL_State state;
+	state.h = 720;
+	state.w = 1280;
+	state.logH = 360;
+	state.logW = 640;
 
-	// Initialize SDL
-	if (!SDL_Init(SDL_INIT_VIDEO))
+	if (!Init(state))
 	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error initializing SDL", nullptr);
-		return 1;
-	}
-	
-	// Create window
-	int h = 540;
-	int w = 960;
-	state.window = SDL_CreateWindow("RoadRunner", w, h, SDL_WINDOW_RESIZABLE);
-	if (!state.window)
-	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error creating game window", nullptr);
-	}
-
-	// Create renderer
-	state.renderer = SDL_CreateRenderer(state.window, nullptr);
-	if (!state.renderer)
-	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error creating renderer", nullptr);
+		return -1;
 	}
 
 	// Load player car texture
 	SDL_Texture* playerCar = IMG_LoadTexture(state.renderer, "assets/textures/cars/Compact/compact_blue.png");
 	SDL_SetTextureScaleMode(playerCar, SDL_SCALEMODE_NEAREST);
-
-	// Handle window resize
-	SDL_SetRenderLogicalPresentation(state.renderer, w, h, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
 	SDL_Event event;
 
@@ -94,6 +80,39 @@ int main(int argc, char *argv[])
 	SDL_DestroyTexture(playerCar);
 	CleanUp(state);
 	return 0;
+}
+
+bool Init(SDL_State &state)
+{
+	bool success = true;
+
+	// Initialize SDL
+	if (!SDL_Init(SDL_INIT_VIDEO))
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error initializing SDL", nullptr);
+		success = false;
+	}
+
+	// Create window
+	state.window = SDL_CreateWindow("RoadRunner", state.w, state.h, SDL_WINDOW_RESIZABLE);
+	if (!state.window)
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error creating game window", nullptr);
+		success = false;
+	}
+
+	// Create renderer
+	state.renderer = SDL_CreateRenderer(state.window, nullptr);
+	if (!state.renderer)
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error creating renderer", nullptr);
+		success = false;
+	}
+
+	// Handle window resize
+	SDL_SetRenderLogicalPresentation(state.renderer, state.logW, state.logH, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+	
+	return success;
 }
 
 void CleanUp(SDL_State &state)
