@@ -10,7 +10,7 @@ struct SDL_State
 {
 	SDL_Window* window;
 	SDL_Renderer* renderer;
-	int h, w, logH, logW;
+	float h, w, logH, logW;
 };
 
 bool Init(SDL_State &state);
@@ -38,6 +38,18 @@ int main(int argc, char *argv[])
 
 	const bool* keyState = SDL_GetKeyboardState(nullptr);
 
+	// Set the player position
+	SDL_FRect pDst{
+			.x = state.logW / 2,
+			.y = state.logH - 63,
+			.w = 26,
+			.h = 58
+	};
+	
+	// Set the player speed
+	float pHorizontalSpeed = 500.0f;
+	Uint64 lastTime = SDL_GetTicks();
+
 	// Start game loop
 	bool isRunning = true;
 	while (isRunning)
@@ -52,6 +64,12 @@ int main(int argc, char *argv[])
 					isRunning = false;
 					break;
 				}
+				case SDL_EVENT_WINDOW_RESIZED:
+				{
+					state.h = event.window.data1;
+					state.w = event.window.data2;
+					break;
+				}
 			}
 
 			if (keyState[SDL_SCANCODE_ESCAPE] == true)
@@ -60,18 +78,19 @@ int main(int argc, char *argv[])
 				break;
 			}
 		}
+		// Calculate delta time
+		Uint64 now = SDL_GetTicks();
+		float deltaTime = (now - lastTime) / 1000.0f;
+		lastTime = now;
 
 		SDL_SetRenderDrawColor(state.renderer, 255, 255, 255, 255);
 		SDL_RenderClear(state.renderer);
 
-		SDL_FRect dst{
-			.x = 0,
-			.y = 0,
-			.w = 26,
-			.h = 58
-		};
+		// Handle player movement
+		if (keyState[SDL_SCANCODE_A] == true)	pDst.x -= 200 * deltaTime;
+		if (keyState[SDL_SCANCODE_D] == true)	pDst.x += 200 * deltaTime;
 
-		SDL_RenderTexture(state.renderer, playerCar, nullptr, &dst);
+		SDL_RenderTexture(state.renderer, playerCar, nullptr, &pDst);
 
 		SDL_RenderPresent(state.renderer);
 	}
