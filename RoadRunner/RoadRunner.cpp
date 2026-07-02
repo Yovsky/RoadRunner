@@ -41,6 +41,10 @@ int main(int argc, char *argv[])
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error creating renderer", nullptr);
 	}
 
+	// Load player car texture
+	SDL_Texture* playerCar = IMG_LoadTexture(state.renderer, "assets/textures/cars/Compact/compact_blue.png");
+	SDL_SetTextureScaleMode(playerCar, SDL_SCALEMODE_NEAREST);
+
 	// Handle window resize
 	SDL_SetRenderLogicalPresentation(state.renderer, w, h, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
@@ -74,9 +78,20 @@ int main(int argc, char *argv[])
 		SDL_SetRenderDrawColor(state.renderer, 255, 255, 255, 255);
 		SDL_RenderClear(state.renderer);
 
+		SDL_FRect dst{
+			.x = 0,
+			.y = 0,
+			.w = 26,
+			.h = 58
+		};
+
+		SDL_RenderTexture(state.renderer, playerCar, nullptr, &dst);
+
 		SDL_RenderPresent(state.renderer);
 	}
 
+	// Clean up
+	SDL_DestroyTexture(playerCar);
 	CleanUp(state);
 	return 0;
 }
